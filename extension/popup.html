@@ -106,6 +106,42 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.12);
     }
     .btn-send:hover { background: #1557b0; }
+    .notice-box {
+      margin-top: 8px;
+      padding: 7px 10px;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+    }
+    .notice-box.ok {
+      background: #188038;
+    }
+    .notice-box.warn {
+      background: #d97706;
+    }
+    .notice-box.err {
+      background: #d93025;
+    }
+    .btn-notice-action {
+      background: rgba(255, 255, 255, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      color: #fff;
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+    .btn-notice-action:hover {
+      background: rgba(255, 255, 255, 0.45);
+    }
     .footer {
       margin-top: 12px;
       display: flex;
@@ -175,6 +211,12 @@
   <button id="btn-send" class="btn-send">
     <span>→ Send to Docs</span>
   </button>
+
+  <!-- Duplicate / Status Notice -->
+  <div id="notice-box" class="notice-box" style="display: none;">
+    <span id="notice-msg">Already sent.</span>
+    <button id="btn-force-send" class="btn-notice-action">Send anyway</button>
+  </div>
 
   <div class="footer">
     <span id="save-status"></span>

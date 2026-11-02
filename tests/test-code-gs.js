@@ -293,6 +293,43 @@ test('doPost: Deduplication prevents sending identical content twice', () => {
   assert.strictEqual(res3.duplicate, undefined);
 });
 
+test('doPost: Deduplication bypassed when force is true', () => {
+  const textContent = 'Kiểm thử gửi đè nội dung trùng lặp';
+  const reqNormal = {
+    postData: {
+      contents: JSON.stringify({
+        token: 'super-secret-token-32-chars-long-abc',
+        text: textContent
+      })
+    }
+  };
+
+  // Lần 1: Thành công
+  const res1 = JSON.parse(sandbox.doPost(reqNormal).content);
+  assert.strictEqual(res1.ok, true);
+  assert.strictEqual(res1.duplicate, undefined);
+
+  // Lần 2 (ngay sau đó, force = false): Phải báo duplicate
+  const res2 = JSON.parse(sandbox.doPost(reqNormal).content);
+  assert.strictEqual(res2.ok, true);
+  assert.strictEqual(res2.duplicate, true);
+
+  // Lần 3 (force = true): Bỏ qua kiểm tra duplicate, ghi vào Doc thành công
+  const reqForce = {
+    postData: {
+      contents: JSON.stringify({
+        token: 'super-secret-token-32-chars-long-abc',
+        text: textContent,
+        force: true
+      })
+    }
+  };
+  const res3 = JSON.parse(sandbox.doPost(reqForce).content);
+  assert.strictEqual(res3.ok, true);
+  assert.strictEqual(res3.duplicate, undefined);
+  assert.strictEqual(res3.docName, 'Tài liệu mặc định');
+});
+
 // --- 7. Flexible Doc Routing ---
 test('doPost: Supports custom docId passed in payload', () => {
   let openedId = null;

@@ -152,7 +152,7 @@ $('site-doc-select').addEventListener('change', async (e) => {
 });
 
 // Nút Thêm link mới & Tự động lấy tên
-$('btn-fetch-add').addEventListener('click', async () => {
+const addDocHandler = async () => {
   const inputVal = $('new-doc-input').value.trim();
   const feedback = $('add-feedback');
 
@@ -197,14 +197,79 @@ $('btn-fetch-add').addEventListener('click', async () => {
     $('new-doc-input').value = '';
     renderDropdowns(newDefault, siteDocs);
   });
+};
+
+$('btn-fetch-add').addEventListener('click', addDocHandler);
+$('new-doc-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    addDocHandler();
+  }
 });
 
-// Gửi ngay từ popup
+/* ---------- Thông báo & Gửi nội dung ---------- */
+
+function showNotice(msg, type = 'warn', showAction = false) {
+  const box = $('notice-box');
+  const msgEl = $('notice-msg');
+  const actBtn = $('btn-force-send');
+
+  box.className = 'notice-box ' + type;
+  msgEl.textContent = msg;
+  actBtn.style.display = showAction ? 'inline-block' : 'none';
+  box.style.display = 'flex';
+}
+
+function hideNotice() {
+  $('notice-box').style.display = 'none';
+}
+
+function triggerSend(force = false) {
+  if (!currentTabId) return;
+  hideNotice();
+  const sendBtn = $('btn-send');
+  const originalText = sendBtn.innerHTML;
+
+  sendBtn.disabled = true;
+  sendBtn.style.opacity = '0.7';
+  sendBtn.textContent = force ? 'Sending anyway...' : 'Sending...';
+
+  chrome.tabs.sendMessage(currentTabId, { type: 'trigger', force }, (res) => {
+    sendBtn.disabled = false;
+    sendBtn.style.opacity = '1';
+    sendBtn.innerHTML = originalText;
+
+    if (chrome.runtime.lastError || !res) {
+      showNotice(
+        chrome.runtime.lastError ? chrome.runtime.lastError.message : 'No response from page.',
+        'err',
+        false
+      );
+      return;
+    }
+
+    if (res.ok) {
+      if (res.duplicate) {
+        showNotice('Already sent.', 'warn', true);
+      } else {
+        const docTitle = res.docName ? `Added to: ${res.docName}` : 'Added to Docs!';
+        showNotice(docTitle, 'ok', false);
+        setTimeout(() => {
+          window.close();
+        }, 1200);
+      }
+    } else {
+      showNotice('Error: ' + (res.error || 'unknown'), 'err', false);
+    }
+  });
+}
+
 $('btn-send').addEventListener('click', () => {
-  if (currentTabId) {
-    chrome.tabs.sendMessage(currentTabId, { type: 'trigger' });
-    window.close();
-  }
+  triggerSend(false);
+});
+
+$('btn-force-send').addEventListener('click', () => {
+  triggerSend(true);
 });
 
 // Mở trang Options

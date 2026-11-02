@@ -160,45 +160,73 @@ function getPayload() {
 
 /* ---------- UI ---------- */
 
-function toast(msg, ok = true) {
+function toast(msg, type = 'ok', action = null) {
   let el = document.getElementById('a2d-toast');
   if (!el) {
     el = document.createElement('div');
     el.id = 'a2d-toast';
     document.documentElement.appendChild(el);
   }
-  el.textContent = msg;
-  el.className = ok ? 'ok' : 'err';
-  el.style.opacity = '1';
+  el.innerHTML = '';
+  const textSpan = document.createElement('span');
+  textSpan.textContent = msg;
+  el.appendChild(textSpan);
+
+  if (action) {
+    const actBtn = document.createElement('button');
+    actBtn.className = 'a2d-toast-btn';
+    actBtn.textContent = action.text;
+    actBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      action.onClick();
+    });
+    el.appendChild(actBtn);
+  }
+
+  el.className = `${type} show`;
   clearTimeout(toast._t);
   toast._t = setTimeout(() => {
-    el.style.opacity = '0';
-  }, 2800);
+    el.classList.remove('show');
+  }, action ? 5000 : 2800);
 }
 
-async function run() {
+async function run(force = false, callback = null) {
   const payload = getPayload();
   if (!payload.text) {
-    toast('Không tìm thấy nội dung để gửi (kiểm tra selector).', false);
+    toast('No content found to send (check selector).', 'err');
+    if (callback) callback({ ok: false, error: 'No content' });
     return;
   }
-  toast('Đang gửi...');
+  toast('Sending...', 'ok');
   try {
-    const res = await chrome.runtime.sendMessage({ type: 'append', payload });
+    const res = await chrome.runtime.sendMessage({
+      type: 'append',
+      payload: { ...payload, force }
+    });
     if (res && res.ok) {
-      const successMsg = res.docName ? `Đã thêm vào: ${res.docName}` : 'Đã thêm vào Docs.';
-      toast(res.duplicate ? 'Nội dung này vừa được gửi rồi.' : successMsg);
+      if (res.duplicate) {
+        toast('Already sent.', 'warn', {
+          text: 'Send anyway',
+          onClick: () => run(true)
+        });
+      } else {
+        const successMsg = res.docName ? `Added to: ${res.docName}` : 'Added to Docs.';
+        toast(successMsg, 'ok');
+      }
     } else {
-      toast('Lỗi: ' + ((res && res.error) || 'không rõ'), false);
+      toast('Error: ' + ((res && res.error) || 'unknown'), 'err');
     }
+    if (callback) callback(res);
   } catch (e) {
-    toast('Lỗi: ' + e, false);
+    toast('Error: ' + e, 'err');
+    if (callback) callback({ ok: false, error: String(e) });
   }
 }
 
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (msg.type === 'trigger') {
-    run();
+    run(!!msg.force, sendResponse);
+    return true; // Giữ kênh mở cho sendResponse bất đồng bộ
   }
   if (msg.type === 'getSiteInfo') {
     const adapter = ADAPTERS.find((a) =>
@@ -216,6 +244,6 @@ const btn = document.createElement('button');
 btn.id = 'a2d-btn';
 btn.textContent = '→ Docs';
 btn.addEventListener('mousedown', (e) => e.preventDefault()); // Giữ nguyên vùng bôi đen khi bấm
-btn.addEventListener('click', run);
+btn.addEventListener('click', () => run(false));
 document.documentElement.appendChild(btn);
 

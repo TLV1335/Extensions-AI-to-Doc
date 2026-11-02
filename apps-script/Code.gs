@@ -28,11 +28,11 @@ function doPost(e) {
     const text = String(data.text || '').trim();
     if (!text) return json({ ok: false, error: 'empty' });
 
-    // Chặn bấm hai lần liên tiếp cùng một nội dung
+    // Chặn bấm hai lần liên tiếp cùng một nội dung (trừ khi có cờ force: true)
     const hash = Utilities.base64Encode(
       Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, text)
     );
-    if (P.getProperty('LAST_HASH') === hash) return json({ ok: true, duplicate: true });
+    if (!data.force && P.getProperty('LAST_HASH') === hash) return json({ ok: true, duplicate: true });
 
     lock.waitLock(15000);
     // Hỗ trợ chọn linh hoạt Doc ID từ extension; nếu không có thì fallback về DOC_ID mặc định trong Script Properties
