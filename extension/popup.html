@@ -9,7 +9,7 @@
       font-size: 13px;
       margin: 0;
       padding: 14px 16px;
-      width: 360px;
+      width: 350px;
       color: #202124;
       background: #ffffff;
     }
@@ -58,14 +58,6 @@
       color: #1a73e8;
       font-weight: 700;
     }
-    label {
-      display: block;
-      font-weight: 600;
-      font-size: 12px;
-      margin-top: 6px;
-      margin-bottom: 4px;
-      color: #3c4043;
-    }
     select, input {
       width: 100%;
       padding: 7px 8px;
@@ -86,7 +78,7 @@
     }
     .btn-add {
       white-space: nowrap;
-      padding: 6px 10px;
+      padding: 6px 12px;
       background: #1a73e8;
       color: #fff;
       border: none;
@@ -106,11 +98,12 @@
       font-weight: 600;
       font-size: 13px;
       cursor: pointer;
-      margin-top: 10px;
+      margin-top: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12);
     }
     .btn-send:hover { background: #1557b0; }
     .footer {
@@ -139,54 +132,53 @@
     .hint-text {
       font-size: 11px;
       color: #5f6368;
-      margin-top: 3px;
+      margin-top: 4px;
     }
   </style>
 </head>
 <body>
   <div class="header">
     <div class="title">AI to Google Docs</div>
-    <div id="conn-status" class="status-badge">Đang tải...</div>
+    <div id="conn-status" class="status-badge">Loading...</div>
   </div>
 
-  <!-- Chọn Doc Mặc định (Áp dụng hàng loạt cho tất cả các trang) -->
+  <!-- Default Doc (Applied globally) -->
   <div class="box">
     <div class="box-title">
-      <span>🌐 Google Doc Mặc định (Áp dụng chung):</span>
+      <span>Default</span>
     </div>
     <select id="default-doc-select"></select>
-    <div class="hint-text">Mọi trang sẽ tự động lưu vào Doc này trừ khi có Doc riêng bên dưới.</div>
+    <div class="hint-text">Applied for all sites by default.</div>
   </div>
 
-  <!-- Cấu hình riêng cho trang đang mở -->
+  <!-- Site-specific Doc -->
   <div class="box" id="site-box">
     <div class="box-title">
-      <span>Trang hiện tại:</span>
-      <span id="site-name" class="site-name">Đang kiểm tra...</span>
+      <span>Site:</span>
+      <span id="site-name" class="site-name">Checking...</span>
     </div>
     <select id="site-doc-select"></select>
-    <div class="hint-text" id="site-hint">Chọn riêng cho trang này hoặc dùng theo Doc mặc định.</div>
+    <div class="hint-text" id="site-hint">Just for this site.</div>
   </div>
 
-  <!-- Thêm nhanh Google Doc mới và Tự động lấy tên -->
+  <!-- Quick Add Doc -->
   <details class="box" style="padding: 8px 12px;">
-    <summary style="font-weight: 600; font-size: 12px; color: #1a73e8; cursor: pointer;">+ Thêm Google Doc mới vào danh sách</summary>
+    <summary style="font-weight: 600; font-size: 12px; color: #1a73e8; cursor: pointer;">+ Add Google Doc</summary>
     <div class="add-row">
-      <input id="new-doc-input" type="text" placeholder="Dán link Google Doc vào đây...">
-      <button id="btn-fetch-add" class="btn-add">Lấy tên & Thêm</button>
+      <input id="new-doc-input" type="text" placeholder="Paste Google Doc link...">
+      <button id="btn-fetch-add" class="btn-add">Fetch & Add</button>
     </div>
     <div id="add-feedback" class="hint-text" style="margin-top: 4px;"></div>
   </details>
 
-  <!-- Nút gửi ngay -->
+  <!-- Send Action Button -->
   <button id="btn-send" class="btn-send">
-    <span>→ Docs</span>
-    <span>(Gửi câu trả lời ngay)</span>
+    <span>→ Send to Docs</span>
   </button>
 
   <div class="footer">
     <span id="save-status"></span>
-    <a id="open-options" class="options-link">Cài đặt nâng cao (URL/Token) ⚙️</a>
+    <a id="open-options" class="options-link">Advanced ⚙️</a>
   </div>
 
   <script src="popup.js"></script>
