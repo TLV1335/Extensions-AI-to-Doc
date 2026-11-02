@@ -160,11 +160,21 @@ function getPayload() {
 
 /* ---------- UI ---------- */
 
+let lastPayload = null;
+
 function toast(msg, type = 'ok', action = null) {
   let el = document.getElementById('a2d-toast');
   if (!el) {
     el = document.createElement('div');
     el.id = 'a2d-toast';
+    // Di chuột vào thì tạm dừng biến mất để kịp bấm nút
+    el.addEventListener('mouseenter', () => clearTimeout(toast._t));
+    el.addEventListener('mouseleave', () => {
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => {
+        el.classList.remove('show');
+      }, action ? 6000 : 2800);
+    });
     document.documentElement.appendChild(el);
   }
   el.innerHTML = '';
@@ -174,9 +184,15 @@ function toast(msg, type = 'ok', action = null) {
 
   if (action) {
     const actBtn = document.createElement('button');
+    actBtn.type = 'button';
     actBtn.className = 'a2d-toast-btn';
     actBtn.textContent = action.text;
+    actBtn.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    });
     actBtn.addEventListener('click', (e) => {
+      e.preventDefault();
       e.stopPropagation();
       action.onClick();
     });
@@ -187,17 +203,23 @@ function toast(msg, type = 'ok', action = null) {
   clearTimeout(toast._t);
   toast._t = setTimeout(() => {
     el.classList.remove('show');
-  }, action ? 5000 : 2800);
+  }, action ? 8000 : 2800);
 }
 
 async function run(force = false, callback = null) {
-  const payload = getPayload();
-  if (!payload.text) {
+  let payload = getPayload();
+  // Nếu là gửi đè (force) mà getPayload() rỗng (do mất vùng bôi đen khi click), dùng lại payload vừa bắt được
+  if ((!payload || !payload.text) && force && lastPayload) {
+    payload = lastPayload;
+  }
+  if (!payload || !payload.text) {
     toast('No content found to send (check selector).', 'err');
     if (callback) callback({ ok: false, error: 'No content' });
     return;
   }
-  toast('Sending...', 'ok');
+  lastPayload = payload;
+
+  toast(force ? 'Sending anyway...' : 'Sending...', 'ok');
   try {
     const res = await chrome.runtime.sendMessage({
       type: 'append',

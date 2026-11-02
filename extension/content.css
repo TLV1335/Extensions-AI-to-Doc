@@ -76,7 +76,7 @@
 
 #a2d-toast.show {
   opacity: 1;
-  pointer-events: auto;
+  pointer-events: auto !important;
   transform: translateY(0);
 }
 
@@ -102,6 +102,7 @@
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
+  pointer-events: auto !important;
   transition: background 0.15s;
 }
 

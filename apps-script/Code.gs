@@ -32,7 +32,8 @@ function doPost(e) {
     const hash = Utilities.base64Encode(
       Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, text)
     );
-    if (!data.force && P.getProperty('LAST_HASH') === hash) return json({ ok: true, duplicate: true });
+    const isForce = data.force === true || data.force === 'true' || Boolean(data.force);
+    if (!isForce && P.getProperty('LAST_HASH') === hash) return json({ ok: true, duplicate: true });
 
     lock.waitLock(15000);
     // Hỗ trợ chọn linh hoạt Doc ID từ extension; nếu không có thì fallback về DOC_ID mặc định trong Script Properties
