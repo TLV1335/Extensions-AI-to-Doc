@@ -1,0 +1,43 @@
+{
+  "manifest_version": 3,
+  "name": "AI to Google Docs",
+  "version": "1.0.0",
+  "description": "Gửi câu trả lời AI vào Google Docs bằng phím tắt.",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://script.google.com/*",
+    "https://script.googleusercontent.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "AI to Google Docs"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chat.deepseek.com/*",
+        "https://chatgpt.com/*",
+        "https://gemini.google.com/*",
+        "https://claude.ai/*",
+        "https://notebooklm.google.com/*",
+        "https://notebook.google.com/*",
+        "https://notebooklm.google/*"
+      ],
+      "js": ["content.js"],
+      "css": ["content.css"]
+    }
+  ],
+  "commands": {
+    "append-to-doc": {
+      "suggested_key": {
+        "default": "Alt+Shift+D"
+      },
+      "description": "Gửi câu trả lời AI vào Google Docs"
+    }
+  },
+  "options_page": "options.html"
+}
+

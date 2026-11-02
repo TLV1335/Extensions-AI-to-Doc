@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>Cài đặt AI to Google Docs</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      max-width: 600px;
+      margin: 32px auto;
+      padding: 0 16px;
+      color: #202124;
+    }
+    h1 {
+      font-size: 22px;
+      margin-bottom: 20px;
+      color: #1a73e8;
+    }
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 24px;
+      margin-bottom: 8px;
+      border-bottom: 1px solid #dadce0;
+      padding-bottom: 6px;
+    }
+    label {
+      display: block;
+      margin-top: 14px;
+      font-weight: 600;
+    }
+    .hint {
+      font-weight: normal;
+      color: #5f6368;
+      font-size: 12px;
+      margin-top: 2px;
+      margin-bottom: 6px;
+    }
+    input {
+      width: 100%;
+      padding: 8px 10px;
+      box-sizing: border-box;
+      border: 1px solid #dadce0;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    input:focus {
+      outline: none;
+      border-color: #1a73e8;
+    }
+    details {
+      margin-top: 16px;
+      background: #f8f9fa;
+      padding: 12px 14px;
+      border-radius: 6px;
+      border: 1px solid #dadce0;
+    }
+    summary {
+      font-weight: 600;
+      cursor: pointer;
+      color: #1a73e8;
+      user-select: none;
+    }
+    .site-group {
+      margin-top: 12px;
+    }
+    .site-label {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .actions {
+      margin-top: 28px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    button {
+      padding: 10px 24px;
+      background: #1a73e8;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1557b0;
+    }
+    #status {
+      font-size: 13px;
+      color: #188038;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <h1>Cấu hình AI to Google Docs</h1>
+  
+  <div class="section-title">1. Kết nối Google Apps Script</div>
+
+  <label for="url">Web App URL</label>
+  <div class="hint">Đường dẫn Web App kết thúc bằng /exec (ví dụ: https://script.google.com/macros/s/.../exec)</div>
+  <input id="url" type="url" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" spellcheck="false">
+
+  <label for="token">Mã Token bí mật</label>
+  <div class="hint">Mã token bí mật trùng khớp với Script Property TOKEN trong Apps Script</div>
+  <input id="token" type="password" placeholder="Chuỗi token bí mật bạn đã đặt" autocomplete="off">
+
+  <div class="section-title">2. Google Doc Mặc định (Áp dụng chung)</div>
+
+  <label for="defaultDoc">Link hoặc ID Google Doc mặc định</label>
+  <div class="hint">Mọi trang AI sẽ tự động lưu vào Google Doc này (nếu không cài Doc riêng bên dưới). Bạn có thể copy nguyên link trang Google Doc dán vào đây.</div>
+  <input id="defaultDoc" type="text" placeholder="https://docs.google.com/document/d/.../edit" autocomplete="off" spellcheck="false">
+
+  <details>
+    <summary>3. Tùy chọn nâng cao: Chỉ định Doc riêng theo từng trang</summary>
+    <div class="hint" style="margin-top: 8px;">Nếu để trống, trang đó sẽ tự động lưu vào Google Doc mặc định ở trên.</div>
+
+    <div class="site-group">
+      <div class="site-label">NotebookLM (notebooklm.google.com)</div>
+      <input id="site_notebooklm" type="text" placeholder="Để trống để dùng Doc mặc định" autocomplete="off">
+    </div>
+
+    <div class="site-group">
+      <div class="site-label">ChatGPT (chatgpt.com)</div>
+      <input id="site_chatgpt" type="text" placeholder="Để trống để dùng Doc mặc định" autocomplete="off">
+    </div>
+
+    <div class="site-group">
+      <div class="site-label">DeepSeek (chat.deepseek.com)</div>
+      <input id="site_deepseek" type="text" placeholder="Để trống để dùng Doc mặc định" autocomplete="off">
+    </div>
+
+    <div class="site-group">
+      <div class="site-label">Gemini (gemini.google.com)</div>
+      <input id="site_gemini" type="text" placeholder="Để trống để dùng Doc mặc định" autocomplete="off">
+    </div>
+
+    <div class="site-group">
+      <div class="site-label">Claude (claude.ai)</div>
+      <input id="site_claude" type="text" placeholder="Để trống để dùng Doc mặc định" autocomplete="off">
+    </div>
+  </details>
+
+  <div class="actions">
+    <button id="save">Lưu toàn bộ cài đặt</button>
+    <span id="status"></span>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>

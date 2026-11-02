@@ -1,0 +1,45 @@
+#a2d-btn {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 2147483647;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: #1a73e8;
+  color: #fff;
+  font: 600 13px system-ui, sans-serif;
+  cursor: pointer;
+  opacity: 0.8;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.2s, background-color 0.2s;
+}
+
+#a2d-btn:hover {
+  opacity: 1;
+  background-color: #1557b0;
+}
+
+#a2d-toast {
+  position: fixed;
+  right: 16px;
+  bottom: 60px;
+  z-index: 2147483647;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: #fff;
+  font: 13px system-ui, sans-serif;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+  pointer-events: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+#a2d-toast.ok {
+  background: #188038;
+}
+
+#a2d-toast.err {
+  background: #d93025;
+}
+

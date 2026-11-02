@@ -1,0 +1,20 @@
+# Secrets and local configurations
+*.local
+*.env
+.env.*
+config.json
+
+# Scratch & temporary dumps
+*.txt
+
+# Logs
+*.log
+npm-debug.log*
+
+# Node / dependencies
+node_modules/
+package-lock.json
+
+# OS files
+.DS_Store
+Thumbs.db

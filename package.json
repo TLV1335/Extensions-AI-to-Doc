@@ -1,0 +1,10 @@
+{
+  "name": "ai-to-google-docs",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Chrome/Edge extension to append AI chat responses to Google Docs",
+  "scripts": {
+    "test": "node tests/run-all-tests.js"
+  }
+}
+

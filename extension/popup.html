@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>AI to Google Docs</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 13px;
+      margin: 0;
+      padding: 14px 16px;
+      width: 340px;
+      color: #202124;
+      background: #ffffff;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #e8eaed;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+    }
+    .title {
+      font-weight: 700;
+      font-size: 15px;
+      color: #1a73e8;
+    }
+    .status-badge {
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 10px;
+      background: #e6f4ea;
+      color: #137333;
+      font-weight: 500;
+    }
+    .status-badge.err {
+      background: #fce8e6;
+      color: #c5221f;
+    }
+    .current-site-box {
+      background: #f8f9fa;
+      border: 1px solid #dadce0;
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 12px;
+    }
+    .site-title {
+      font-weight: 600;
+      font-size: 12px;
+      color: #3c4043;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .site-name {
+      color: #1a73e8;
+      font-weight: 700;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      font-size: 12px;
+      margin-top: 10px;
+      margin-bottom: 4px;
+      color: #3c4043;
+    }
+    input {
+      width: 100%;
+      padding: 7px 9px;
+      box-sizing: border-box;
+      border: 1px solid #dadce0;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    input:focus {
+      outline: none;
+      border-color: #1a73e8;
+    }
+    .btn-send {
+      width: 100%;
+      padding: 9px;
+      background: #1a73e8;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-send:hover {
+      background: #1557b0;
+    }
+    .btn-save {
+      width: 100%;
+      padding: 7px;
+      background: #fff;
+      color: #1a73e8;
+      border: 1px solid #1a73e8;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .btn-save:hover {
+      background: #f1f8ff;
+    }
+    .footer {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid #f1f3f4;
+      padding-top: 8px;
+    }
+    .options-link {
+      font-size: 11px;
+      color: #5f6368;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .options-link:hover {
+      color: #1a73e8;
+      text-decoration: underline;
+    }
+    #save-status {
+      font-size: 11px;
+      color: #188038;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="title">AI to Google Docs</div>
+    <div id="conn-status" class="status-badge">Đã kết nối</div>
+  </div>
+
+  <!-- Thông tin trang hiện tại -->
+  <div class="current-site-box">
+    <div class="site-title">
+      <span>Trang hiện tại:</span>
+      <span id="site-name" class="site-name">Đang kiểm tra...</span>
+    </div>
+    <label for="current-site-doc" style="margin-top: 4px;">Doc riêng cho trang này:</label>
+    <input id="current-site-doc" type="text" placeholder="Dán link Google Doc (để trống = dùng mặc định)">
+  </div>
+
+  <!-- Google Doc Mặc định -->
+  <label for="default-doc">Google Doc Mặc định (toàn cục):</label>
+  <input id="default-doc" type="text" placeholder="https://docs.google.com/document/d/.../edit">
+
+  <button id="btn-save" class="btn-save">Lưu nhanh cài đặt Doc</button>
+
+  <button id="btn-send" class="btn-send">
+    <span>→ Docs</span>
+    <span>(Gửi câu trả lời ngay)</span>
+  </button>
+
+  <div class="footer">
+    <span id="save-status"></span>
+    <a id="open-options" class="options-link">Cài đặt nâng cao (URL/Token) ⚙️</a>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
+
