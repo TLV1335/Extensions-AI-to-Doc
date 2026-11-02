@@ -9,7 +9,7 @@
       font-size: 13px;
       margin: 0;
       padding: 14px 16px;
-      width: 340px;
+      width: 360px;
       color: #202124;
       background: #ffffff;
     }
@@ -18,7 +18,7 @@
       align-items: center;
       justify-content: space-between;
       border-bottom: 1px solid #e8eaed;
-      padding-bottom: 10px;
+      padding-bottom: 8px;
       margin-bottom: 12px;
     }
     .title {
@@ -28,7 +28,7 @@
     }
     .status-badge {
       font-size: 11px;
-      padding: 2px 6px;
+      padding: 2px 7px;
       border-radius: 10px;
       background: #e6f4ea;
       color: #137333;
@@ -38,21 +38,21 @@
       background: #fce8e6;
       color: #c5221f;
     }
-    .current-site-box {
+    .box {
       background: #f8f9fa;
       border: 1px solid #dadce0;
       border-radius: 6px;
-      padding: 10px;
-      margin-bottom: 12px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
     }
-    .site-title {
+    .box-title {
       font-weight: 600;
       font-size: 12px;
       color: #3c4043;
       margin-bottom: 6px;
       display: flex;
       align-items: center;
-      gap: 6px;
+      justify-content: space-between;
     }
     .site-name {
       color: #1a73e8;
@@ -62,25 +62,43 @@
       display: block;
       font-weight: 600;
       font-size: 12px;
-      margin-top: 10px;
+      margin-top: 6px;
       margin-bottom: 4px;
       color: #3c4043;
     }
-    input {
+    select, input {
       width: 100%;
-      padding: 7px 9px;
+      padding: 7px 8px;
       box-sizing: border-box;
       border: 1px solid #dadce0;
       border-radius: 4px;
       font-size: 12px;
+      background: #fff;
     }
-    input:focus {
+    select:focus, input:focus {
       outline: none;
       border-color: #1a73e8;
     }
+    .add-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .btn-add {
+      white-space: nowrap;
+      padding: 6px 10px;
+      background: #1a73e8;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-add:hover { background: #1557b0; }
     .btn-send {
       width: 100%;
-      padding: 9px;
+      padding: 10px;
       background: #1a73e8;
       color: #fff;
       border: none;
@@ -88,30 +106,13 @@
       font-weight: 600;
       font-size: 13px;
       cursor: pointer;
-      margin-top: 12px;
+      margin-top: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
     }
-    .btn-send:hover {
-      background: #1557b0;
-    }
-    .btn-save {
-      width: 100%;
-      padding: 7px;
-      background: #fff;
-      color: #1a73e8;
-      border: 1px solid #1a73e8;
-      border-radius: 4px;
-      font-weight: 600;
-      font-size: 12px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    .btn-save:hover {
-      background: #f1f8ff;
-    }
+    .btn-send:hover { background: #1557b0; }
     .footer {
       margin-top: 12px;
       display: flex;
@@ -135,30 +136,49 @@
       color: #188038;
       font-weight: 600;
     }
+    .hint-text {
+      font-size: 11px;
+      color: #5f6368;
+      margin-top: 3px;
+    }
   </style>
 </head>
 <body>
   <div class="header">
     <div class="title">AI to Google Docs</div>
-    <div id="conn-status" class="status-badge">Đã kết nối</div>
+    <div id="conn-status" class="status-badge">Đang tải...</div>
   </div>
 
-  <!-- Thông tin trang hiện tại -->
-  <div class="current-site-box">
-    <div class="site-title">
+  <!-- Chọn Doc Mặc định (Áp dụng hàng loạt cho tất cả các trang) -->
+  <div class="box">
+    <div class="box-title">
+      <span>🌐 Google Doc Mặc định (Áp dụng chung):</span>
+    </div>
+    <select id="default-doc-select"></select>
+    <div class="hint-text">Mọi trang sẽ tự động lưu vào Doc này trừ khi có Doc riêng bên dưới.</div>
+  </div>
+
+  <!-- Cấu hình riêng cho trang đang mở -->
+  <div class="box" id="site-box">
+    <div class="box-title">
       <span>Trang hiện tại:</span>
       <span id="site-name" class="site-name">Đang kiểm tra...</span>
     </div>
-    <label for="current-site-doc" style="margin-top: 4px;">Doc riêng cho trang này:</label>
-    <input id="current-site-doc" type="text" placeholder="Dán link Google Doc (để trống = dùng mặc định)">
+    <select id="site-doc-select"></select>
+    <div class="hint-text" id="site-hint">Chọn riêng cho trang này hoặc dùng theo Doc mặc định.</div>
   </div>
 
-  <!-- Google Doc Mặc định -->
-  <label for="default-doc">Google Doc Mặc định (toàn cục):</label>
-  <input id="default-doc" type="text" placeholder="https://docs.google.com/document/d/.../edit">
+  <!-- Thêm nhanh Google Doc mới và Tự động lấy tên -->
+  <details class="box" style="padding: 8px 12px;">
+    <summary style="font-weight: 600; font-size: 12px; color: #1a73e8; cursor: pointer;">+ Thêm Google Doc mới vào danh sách</summary>
+    <div class="add-row">
+      <input id="new-doc-input" type="text" placeholder="Dán link Google Doc vào đây...">
+      <button id="btn-fetch-add" class="btn-add">Lấy tên & Thêm</button>
+    </div>
+    <div id="add-feedback" class="hint-text" style="margin-top: 4px;"></div>
+  </details>
 
-  <button id="btn-save" class="btn-save">Lưu nhanh cài đặt Doc</button>
-
+  <!-- Nút gửi ngay -->
   <button id="btn-send" class="btn-send">
     <span>→ Docs</span>
     <span>(Gửi câu trả lời ngay)</span>
@@ -172,4 +192,3 @@
   <script src="popup.js"></script>
 </body>
 </html>
-

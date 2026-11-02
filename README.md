@@ -9,14 +9,15 @@ Tài liệu này hoạt động như một nguồn dữ liệu sống (Knowledge
 ## ✨ Tính năng nổi bật
 
 - **Hỗ trợ đa nền tảng AI hàng đầu:** Tích hợp bộ chuyển đổi thông minh cho **Google NotebookLM**, **ChatGPT**, **DeepSeek**, **Claude**, và **Google Gemini**.
-- **Định tuyến Google Docs linh hoạt (Hybrid Routing):**
-  - **Doc Mặc định (Toàn cục):** Nhập 1 link Google Doc áp dụng cho tất cả các trang.
-  - **Doc Riêng theo từng trang:** Chỉ định riêng biệt (ví dụ: *NotebookLM* vào Doc A, *ChatGPT* vào Doc B...).
+- **Định tuyến Google Docs linh hoạt (Hybrid Routing) với Menu sổ xuống:**
+  - **Menu sổ xuống chọn Doc mặc định:** Lưu danh sách các Google Docs theo tên thật, người dùng chỉ cần bấm menu chọn tên Doc là áp dụng hàng loạt cho tất cả các trang ngay tức thì.
+  - **Tự động nhận diện tên tài liệu từ link:** Chỉ cần dán link Google Doc và bấm *"Lấy tên & Thêm"*, hệ thống tự động kết nối và lấy đúng tiêu đề tài liệu.
+  - **Doc Riêng theo từng trang:** Chỉ định tài liệu riêng cho từng nền tảng (ví dụ: *NotebookLM* lưu vào Doc A, *ChatGPT* lưu vào Doc B...). Trang nào đã có Doc riêng thì không bị áp dụng bởi Doc mặc định.
   - **Fallback thông minh:** Tự động lấy Doc mặc định nếu trang đó chưa được gán Doc riêng.
-- **Thao tác cực nhanh qua Popup:** Bấm trực tiếp vào icon tiện ích trên thanh công cụ để dán link Doc và gửi nội dung ngay lập tức.
+- **Thao tác cực nhanh qua Popup:** Bấm trực tiếp vào icon tiện ích trên thanh công cụ để đổi nhanh Doc mặc định, đổi Doc riêng cho trang hiện tại và gửi nội dung ngay lập tức.
 - **Tự động lọc rác & khối suy luận ("Thoughts"):** Loại bỏ các khối suy nghĩ (DeepSeek-R1 / NotebookLM Thoughts) để tài liệu luôn gọn gàng và chuẩn xác.
 - **Chuyển đổi định dạng trung thực:** Giữ nguyên các cấp tiêu đề Heading H1-H6, danh sách đánh số liên tục, code monospace, và bảng biểu.
-- **Khung kiểm thử tự động toàn diện (36 Test Cases):** Áp dụng đầy đủ phương pháp luận kiểm thử phần mềm (Kiểm thử biên BVA, Phân vùng tương đương EP, Kiểm thử hồi quy Regression).
+- **Khung kiểm thử tự động toàn diện (37 Test Cases):** Áp dụng đầy đủ phương pháp luận kiểm thử phần mềm (Kiểm thử biên BVA, Phân vùng tương đương EP, Kiểm thử hồi quy Regression).
 
 ---
 
@@ -98,7 +99,7 @@ Tài liệu này hoạt động như một nguồn dữ liệu sống (Knowledge
 Dự án tích hợp bộ kiểm thử đơn vị, kiểm thử tích hợp logic và kiểm toán bảo mật độc lập:
 
 ```bash
-# Chạy toàn bộ 36 ca kiểm thử hồi quy
+# Chạy toàn bộ 37 ca kiểm thử hồi quy
 npm test
 ```
 

@@ -8,7 +8,7 @@
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       font-size: 14px;
       line-height: 1.5;
-      max-width: 600px;
+      max-width: 620px;
       margin: 32px auto;
       padding: 0 16px;
       color: #202124;
@@ -38,17 +38,59 @@
       margin-top: 2px;
       margin-bottom: 6px;
     }
-    input {
+    input, select {
       width: 100%;
       padding: 8px 10px;
       box-sizing: border-box;
       border: 1px solid #dadce0;
       border-radius: 4px;
       font-size: 14px;
+      background: #fff;
     }
-    input:focus {
+    input:focus, select:focus {
       outline: none;
       border-color: #1a73e8;
+    }
+    .add-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .btn-add {
+      white-space: nowrap;
+      padding: 8px 16px;
+      background: #1a73e8;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-add:hover { background: #1557b0; }
+    .doc-list {
+      margin-top: 10px;
+      border: 1px solid #e8eaed;
+      border-radius: 6px;
+      background: #f8f9fa;
+      padding: 8px 12px;
+    }
+    .doc-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid #f1f3f4;
+    }
+    .doc-item:last-child { border-bottom: none; }
+    .doc-name { font-weight: 600; color: #202124; }
+    .doc-id { font-size: 11px; color: #5f6368; }
+    .btn-del {
+      background: none;
+      border: none;
+      color: #d93025;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
     }
     details {
       margin-top: 16px;
@@ -77,7 +119,7 @@
       align-items: center;
       gap: 12px;
     }
-    button {
+    button.btn-primary {
       padding: 10px 24px;
       background: #1a73e8;
       color: #fff;
@@ -87,7 +129,7 @@
       font-size: 14px;
       cursor: pointer;
     }
-    button:hover {
+    button.btn-primary:hover {
       background: #1557b0;
     }
     #status {
@@ -110,44 +152,57 @@
   <div class="hint">Mã token bí mật trùng khớp với Script Property TOKEN trong Apps Script</div>
   <input id="token" type="password" placeholder="Chuỗi token bí mật bạn đã đặt" autocomplete="off">
 
-  <div class="section-title">2. Google Doc Mặc định (Áp dụng chung)</div>
+  <div class="section-title">2. Danh sách Google Docs & Doc Mặc định</div>
 
-  <label for="defaultDoc">Link hoặc ID Google Doc mặc định</label>
-  <div class="hint">Mọi trang AI sẽ tự động lưu vào Google Doc này (nếu không cài Doc riêng bên dưới). Bạn có thể copy nguyên link trang Google Doc dán vào đây.</div>
-  <input id="defaultDoc" type="text" placeholder="https://docs.google.com/document/d/.../edit" autocomplete="off" spellcheck="false">
+  <label for="default-doc-select">Google Doc Mặc định (Áp dụng hàng loạt):</label>
+  <div class="hint">Chọn từ menu sổ xuống. Tất cả các trang AI sẽ tự động lưu vào Doc này (trừ khi trang đó được gán Doc riêng).</div>
+  <select id="default-doc-select"></select>
+
+  <label style="margin-top: 16px;">Thêm Google Doc mới vào danh sách (Tự động lấy tên):</label>
+  <div class="hint">Dán link Google Doc (hoặc ID) rồi bấm nút để hệ thống tự động tìm và lấy tên tài liệu:</div>
+  <div class="add-row">
+    <input id="new-doc-input" type="text" placeholder="https://docs.google.com/document/d/.../edit">
+    <button id="btn-fetch-add" class="btn-add">Lấy tên & Thêm</button>
+  </div>
+  <div id="add-feedback" class="hint" style="margin-top: 4px;"></div>
+
+  <div class="doc-list" id="doc-list-container" style="display: none; margin-top: 12px;">
+    <div style="font-weight: 600; font-size: 12px; margin-bottom: 6px; color: #3c4043;">Tài liệu đã lưu:</div>
+    <div id="doc-list-items"></div>
+  </div>
 
   <details>
     <summary>3. Tùy chọn nâng cao: Chỉ định Doc riêng theo từng trang</summary>
-    <div class="hint" style="margin-top: 8px;">Nếu để trống, trang đó sẽ tự động lưu vào Google Doc mặc định ở trên.</div>
+    <div class="hint" style="margin-top: 8px;">Nếu chọn "(Dùng Google Doc mặc định chung)", trang đó sẽ tự động lưu theo menu số 2 ở trên.</div>
 
     <div class="site-group">
       <div class="site-label">NotebookLM (notebooklm.google.com)</div>
-      <input id="site_notebooklm" type="text" placeholder="Để trống để dùng Doc mặc định" autocomplete="off">
+      <select id="site_notebooklm"></select>
     </div>
 
     <div class="site-group">
       <div class="site-label">ChatGPT (chatgpt.com)</div>
-      <input id="site_chatgpt" type="text" placeholder="Để trống để dùng Doc mặc định" autocomplete="off">
+      <select id="site_chatgpt"></select>
     </div>
 
     <div class="site-group">
       <div class="site-label">DeepSeek (chat.deepseek.com)</div>
-      <input id="site_deepseek" type="text" placeholder="Để trống để dùng Doc mặc định" autocomplete="off">
+      <select id="site_deepseek"></select>
     </div>
 
     <div class="site-group">
       <div class="site-label">Gemini (gemini.google.com)</div>
-      <input id="site_gemini" type="text" placeholder="Để trống để dùng Doc mặc định" autocomplete="off">
+      <select id="site_gemini"></select>
     </div>
 
     <div class="site-group">
       <div class="site-label">Claude (claude.ai)</div>
-      <input id="site_claude" type="text" placeholder="Để trống để dùng Doc mặc định" autocomplete="off">
+      <select id="site_claude"></select>
     </div>
   </details>
 
   <div class="actions">
-    <button id="save">Lưu toàn bộ cài đặt</button>
+    <button id="save" class="btn-primary">Lưu toàn bộ cài đặt</button>
     <span id="status"></span>
   </div>
 

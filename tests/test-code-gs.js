@@ -119,9 +119,10 @@ const sandbox = {
       FONT_FAMILY: 'FONT_FAMILY',
       FONT_SIZE: 'FONT_SIZE'
     },
-    openById: () => ({
+    openById: (id) => ({
       getBody: () => new MockBody(),
-      saveAndClose: () => {}
+      saveAndClose: () => {},
+      getName: () => (id === 'custom-doc-99' ? 'Ghi chú môn SWT301' : 'Tài liệu mặc định')
     })
   },
   Utilities: {
@@ -338,6 +339,21 @@ test('doPost: Falls back to ScriptProperties DOC_ID when docId is omitted', () =
   assert.strictEqual(openedId, 'test-doc-id-12345', 'Phải fallback về DOC_ID mặc định');
 
   sandbox.DocumentApp.openById = origOpen;
+});
+
+test('doPost: Supports action getDocName to return document name', () => {
+  const req = {
+    postData: {
+      contents: JSON.stringify({
+        token: 'super-secret-token-32-chars-long-abc',
+        action: 'getDocName',
+        docId: 'custom-doc-99'
+      })
+    }
+  };
+  const res = JSON.parse(sandbox.doPost(req).content);
+  assert.strictEqual(res.ok, true);
+  assert.strictEqual(res.name, 'Ghi chú môn SWT301');
 });
 
 module.exports = suite;

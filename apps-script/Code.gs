@@ -14,6 +14,17 @@ function doPost(e) {
     if (!data.token || data.token !== P.getProperty('TOKEN')) {
       return json({ ok: false, error: 'unauthorized' });
     }
+
+    // Hành động 1: Lấy tên Google Doc tự động theo Doc ID
+    if (data.action === 'getDocName') {
+      const targetDocId = (data.docId && String(data.docId).trim()) || P.getProperty('DOC_ID');
+      if (!targetDocId) return json({ ok: false, error: 'Chưa cấu hình Google Doc ID.' });
+      lock.waitLock(10000);
+      const doc = DocumentApp.openById(targetDocId);
+      return json({ ok: true, name: doc.getName() });
+    }
+
+    // Hành động 2: Ghi nội dung vào Doc (mặc định)
     const text = String(data.text || '').trim();
     if (!text) return json({ ok: false, error: 'empty' });
 
@@ -33,7 +44,7 @@ function doPost(e) {
     doc.saveAndClose();
     P.setProperty('LAST_HASH', hash);
 
-    return json({ ok: true });
+    return json({ ok: true, docName: doc.getName() });
   } catch (err) {
     return json({ ok: false, error: String(err) });
   } finally {

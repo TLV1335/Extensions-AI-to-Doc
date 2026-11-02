@@ -186,7 +186,8 @@ async function run() {
   try {
     const res = await chrome.runtime.sendMessage({ type: 'append', payload });
     if (res && res.ok) {
-      toast(res.duplicate ? 'Nội dung này vừa được gửi rồi.' : 'Đã thêm vào Docs.');
+      const successMsg = res.docName ? `Đã thêm vào: ${res.docName}` : 'Đã thêm vào Docs.';
+      toast(res.duplicate ? 'Nội dung này vừa được gửi rồi.' : successMsg);
     } else {
       toast('Lỗi: ' + ((res && res.error) || 'không rõ'), false);
     }
