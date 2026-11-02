@@ -61,12 +61,34 @@ class MockElement extends MockNode {
     return this.childNodes.map((c) => c.textContent).join('');
   }
 
+  querySelector(selector) {
+    const list = this.querySelectorAll(selector);
+    return list.length > 0 ? list[0] : null;
+  }
+
   querySelectorAll(selector) {
     const results = [];
-    const targetTag = selector.toUpperCase();
+    const selectors = selector.split(',').map((s) => s.trim());
+
+    function matches(el, sel) {
+      if (sel.startsWith('.')) {
+        const cls = sel.slice(1);
+        const elCls = el.getAttribute('class') || '';
+        return elCls.split(/\s+/).includes(cls);
+      }
+      if (sel.startsWith('[') && sel.endsWith(']')) {
+        const inner = sel.slice(1, -1);
+        const [attr, val] = inner.split('=');
+        const cleanVal = val ? val.replace(/^["']|["']$/g, '') : null;
+        const actual = el.getAttribute(attr);
+        return cleanVal !== null ? actual === cleanVal : actual !== null;
+      }
+      return el.tagName === sel.toUpperCase();
+    }
+
     function walk(el) {
       for (const child of el.children) {
-        if (child.tagName === targetTag) {
+        if (selectors.some((s) => matches(child, s))) {
           results.push(child);
         }
         walk(child);
@@ -95,7 +117,7 @@ function parseHTML(html) {
   const stack = [root];
 
   // Tokenize tags and texts
-  const tokenRegex = /<(\/)?([a-zA-Z0-9]+)([^>]*)>|([^<]+)/g;
+  const tokenRegex = /<(\/)?([a-zA-Z0-9_-]+)([^>]*)>|([^<]+)/g;
   let match;
 
   while ((match = tokenRegex.exec(html)) !== null) {

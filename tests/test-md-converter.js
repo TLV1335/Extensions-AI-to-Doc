@@ -180,4 +180,24 @@ test('NotebookLM: Angular custom elements, role heading, code formatting & lists
   assert.strictEqual(res.includes('`Cheat_Seat.md`'), true, 'Phải chuyển b.code thành inline code');
 });
 
+// --- 10. Real-World Fixture: Gemini Python Code Execution & File Reading ---
+test('Gemini: Filters out Python file-reading code execution blocks and retains response markdown', () => {
+  const html = fs.readFileSync('tests/fixtures/gemini-sample.html', 'utf8');
+  const dom = parseHTML(html);
+  const res = toMarkdown(dom);
+
+  // Không chứa code Python đọc file
+  assert.strictEqual(res.includes('import pandas as pd'), false, 'Phải loại bỏ mã Python đọc file ngầm');
+  assert.strictEqual(res.includes('NumPy_100_Questions_Tricks_And_Gotchas.csv'), false, 'Phải loại bỏ tên file trong code ngầm');
+  // Không chứa stdout/stderr kết quả chạy mã
+  assert.strictEqual(res.includes('DataFrame'), false, 'Phải loại bỏ kết quả in stdout của Python');
+  assert.strictEqual(res.includes('Kết quả chạy mã'), false, 'Phải loại bỏ tiêu đề Kết quả chạy mã');
+
+  // Chứa nội dung câu trả lời chính
+  assert.strictEqual(res.includes('Dưới đây là toàn bộ các hàm và phương thức NumPy'), true, 'Phải giữ lại đoạn văn trả lời');
+  assert.strictEqual(res.includes('### I. Nhóm khởi tạo mảng (Array Creation)'), true, 'Phải chuyển đổi đúng Heading 3');
+  assert.strictEqual(res.includes('- **`np.array`**: Tạo mảng ndarray từ list'), true, 'Phải chuyển đổi đúng danh sách bullet list');
+  assert.strictEqual(res.includes('- **`np.zeros`**: Tạo mảng mới chứa toàn số 0'), true, 'Phải chuyển đổi đúng item 2');
+});
+
 module.exports = suite;

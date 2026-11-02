@@ -35,7 +35,18 @@ const ADAPTERS = [
   }
 ];
 
-const SKIP = new Set(['BUTTON', 'SVG', 'STYLE', 'SCRIPT', 'NOSCRIPT', 'THINKING-CHAIN-VIEW']);
+const SKIP = new Set([
+  'BUTTON',
+  'SVG',
+  'STYLE',
+  'SCRIPT',
+  'NOSCRIPT',
+  'THINKING-CHAIN-VIEW',
+  'THINKING-OVERLAY',
+  'GEM-ICON-BUTTON',
+  'MAT-ICON',
+  'MAT-DIVIDER'
+]);
 
 /* ---------- HTML -> Markdown ---------- */
 
@@ -49,6 +60,31 @@ function md(node, depth = 0) {
   const tag = isFrag ? 'frag' : node.tagName.toLowerCase();
   if (!isFrag && SKIP.has(node.tagName.toUpperCase())) return '';
 
+  const cls = (node.getAttribute && node.getAttribute('class')) || '';
+  const styleAttr = (node.getAttribute && node.getAttribute('style')) || '';
+
+  // Bỏ qua các khối ẩn (display: none hoặc thuộc tính hidden)
+  if (
+    (node.style && node.style.display === 'none') ||
+    /display:\s*none/i.test(styleAttr) ||
+    (node.hasAttribute && node.hasAttribute('hidden'))
+  ) {
+    return '';
+  }
+
+  // Bỏ qua khối code execution khi Gemini chạy ngầm đọc/phân tích file
+  if (tag === 'response-element' || tag === 'code-block' || /\bcode-block\b/.test(cls)) {
+    if (
+      node.querySelector &&
+      node.querySelector('.code-result-container, [data-test-id="code-output-stdout-stderr"], .code-result-divider')
+    ) {
+      return '';
+    }
+  }
+  if (/\b(code-result-container|code-block-decoration|code-result-divider)\b/.test(cls)) {
+    return '';
+  }
+
   const kids = () => [...node.childNodes].map((c) => md(c, depth)).join('');
 
   // Hỗ trợ heading dạng role="heading" và aria-level (NotebookLM, v.v.)
@@ -60,7 +96,6 @@ function md(node, depth = 0) {
   }
 
   // Inline code dạng <b class="code"> hoặc <span class="code">
-  const cls = (node.getAttribute && node.getAttribute('class')) || '';
   if (/\bcode\b/.test(cls) && (tag === 'b' || tag === 'span' || tag === 'strong')) {
     return '`' + kids().trim() + '`';
   }
