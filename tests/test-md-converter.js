@@ -16,7 +16,7 @@ const sandbox = {
   location: { hostname: 'chatgpt.com', href: 'https://chatgpt.com/test' },
   document: {
     documentElement: { appendChild: () => {} },
-    createElement: () => ({ addEventListener: () => {} }),
+    createElement: () => ({ addEventListener: () => {}, setAttribute: () => {} }),
     querySelectorAll: () => []
   },
   window: { getSelection: () => null },

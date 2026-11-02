@@ -242,7 +242,8 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
 
 const btn = document.createElement('button');
 btn.id = 'a2d-btn';
-btn.textContent = '→ Docs';
+btn.title = 'Send to Google Docs (Alt+Shift+D)';
+btn.innerHTML = '<span class="a2d-arrow">→</span><span class="a2d-txt">Docs</span>';
 btn.addEventListener('mousedown', (e) => e.preventDefault()); // Giữ nguyên vùng bôi đen khi bấm
 btn.addEventListener('click', () => run(false));
 document.documentElement.appendChild(btn);
