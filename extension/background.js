@@ -1,13 +1,7 @@
 /**
  * background.js
- * Service Worker quản lý điều phối: Phím tắt, Google Docs REST API (OAuth2) và Apps Script Web App.
+ * Service Worker quản lý: Phím tắt và giao tiếp với Google Apps Script Web App.
  */
-
-try {
-  importScripts('gdocs-compiler.js', 'gdocs-service.js');
-} catch (e) {
-  console.warn('importScripts failed:', e);
-}
 
 function extractDocId(str) {
   if (!str) return '';
@@ -33,39 +27,12 @@ chrome.commands.onCommand.addListener(async (command) => {
   if (command !== 'append-to-doc') return;
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (tab && tab.id) {
-    chrome.tabs.sendMessage(tab.id, { type: 'trigger' }).catch(() => {});
+    chrome.tabs.sendMessage(tab.id, { type: 'trigger' }).catch(() => { });
   }
 });
 
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
-  // 1. Đăng nhập Google
-  if (msg.type === 'loginGoogle') {
-    (async () => {
-      try {
-        const token = await GDocsService.getAuthToken(true);
-        const userInfo = await GDocsService.getUserInfo(token);
-        sendResponse({ ok: true, email: userInfo?.email || '', name: userInfo?.name || '' });
-      } catch (err) {
-        sendResponse({ ok: false, error: err.message || String(err) });
-      }
-    })();
-    return true;
-  }
-
-  // 2. Đăng xuất Google
-  if (msg.type === 'logoutGoogle') {
-    (async () => {
-      try {
-        await GDocsService.logout();
-        sendResponse({ ok: true });
-      } catch (err) {
-        sendResponse({ ok: false, error: String(err) });
-      }
-    })();
-    return true;
-  }
-
-  // 3. Lấy tên tự động từ Google Docs
+  // 1. Lấy tên tự động từ Google Docs qua Apps Script
   if (msg.type === 'getDocName') {
     (async () => {
       try {
@@ -75,39 +42,14 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
           return;
         }
 
-        const store = await chrome.storage.local.get({
-          authMode: 'google',
-          oauthToken: '',
-          tokenExpiry: 0,
-          url: '',
-          token: ''
-        });
-
-        const activeMode = msg.mode || store.authMode;
-
-        // Ưu tiên dùng Google Docs REST API (nếu chọn mode google hoặc có oauthToken)
-        if (activeMode === 'google' || (!store.url && store.oauthToken)) {
-          try {
-            const title = await GDocsService.getDocTitle(docId);
-            sendResponse({ ok: true, name: title });
-            return;
-          } catch (gErr) {
-            // Nếu lỗi Google Docs API mà có cấu hình Apps Script thì fallback, còn không thì ném lỗi
-            if (!store.url) {
-              sendResponse({ ok: false, error: gErr.message || String(gErr) });
-              return;
-            }
-          }
-        }
-
-        // Dùng Apps Script Web App
+        const store = await chrome.storage.local.get({ url: '', token: '' });
         const appUrl = msg.url || store.url;
         const appToken = msg.token || store.token;
 
         if (!appUrl || !appToken) {
           sendResponse({
             ok: false,
-            error: 'Chưa cấu hình tài khoản Google hoặc Web App URL/Token.'
+            error: 'Chưa cấu hình Web App URL/Token.'
           });
           return;
         }
@@ -132,19 +74,21 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     return true;
   }
 
-  // 4. Ghi nội dung vào Doc
+  // 2. Ghi nội dung vào Doc
   if (msg.type === 'append') {
     (async () => {
       try {
         const store = await chrome.storage.local.get({
-          authMode: 'google',
-          oauthToken: '',
-          tokenExpiry: 0,
           url: '',
           token: '',
           defaultDoc: '',
           siteDocs: {}
         });
+
+        if (!store.url || !store.token) {
+          sendResponse({ ok: false, error: 'Chưa cấu hình Web App URL/Token (vào Cài đặt của extension).' });
+          return;
+        }
 
         // Xác định Doc ID đích
         let docId = '';
@@ -156,34 +100,14 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
             if (matchedKey && map[matchedKey]) {
               docId = extractDocId(map[matchedKey]);
             }
-          } catch (_) {}
+          } catch (_) { }
         }
         if (!docId && store.defaultDoc) {
           docId = extractDocId(store.defaultDoc);
         }
 
         if (!docId) {
-          sendResponse({ ok: false, error: 'Chưa chọn Google Doc để lưu. Vui lòng vào Cài đặt hoặc Popup để chọn.' });
-          return;
-        }
-
-        // Chế độ 1: Google Docs REST API (Tự động 100%)
-        if (store.authMode === 'google' || (!store.url && store.oauthToken)) {
-          try {
-            const result = await GDocsService.appendMarkdownToDoc(docId, msg.payload.text);
-            sendResponse(result);
-            return;
-          } catch (gErr) {
-            if (!store.url) {
-              sendResponse({ ok: false, error: gErr.message || String(gErr) });
-              return;
-            }
-          }
-        }
-
-        // Chế độ 2: Apps Script Web App
-        if (!store.url || !store.token) {
-          sendResponse({ ok: false, error: 'Chưa cấu hình tài khoản Google hoặc Web App URL.' });
+          sendResponse({ ok: false, error: 'Chưa chọn Google Doc để lưu. Vui lòng vào Cài đặt để chọn.' });
           return;
         }
 

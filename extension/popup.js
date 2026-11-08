@@ -12,9 +12,7 @@ function extractDocId(str) {
 
 // Khởi tạo Popup
 async function init() {
-  const { authMode, oauthToken, url, token, defaultDoc, siteDocs, savedDocs } = await chrome.storage.local.get({
-    authMode: 'google',
-    oauthToken: '',
+  const { url, token, defaultDoc, siteDocs, savedDocs } = await chrome.storage.local.get({
     url: '',
     token: '',
     defaultDoc: '',
@@ -24,17 +22,11 @@ async function init() {
 
   // Trạng thái kết nối
   const connBadge = $('conn-status');
-  const isGoogleConnected = authMode === 'google' && Boolean(oauthToken);
-  const isAppsScriptConnected = Boolean(url && token);
-
-  if (isGoogleConnected) {
-    connBadge.textContent = 'Google Connected';
-    connBadge.className = 'status-badge';
-  } else if (isAppsScriptConnected) {
-    connBadge.textContent = 'Apps Script OK';
+  if (url && token) {
+    connBadge.textContent = 'Connected';
     connBadge.className = 'status-badge';
   } else {
-    connBadge.textContent = 'Chưa kết nối';
+    connBadge.textContent = 'Missing URL/Token';
     connBadge.className = 'status-badge err';
   }
 

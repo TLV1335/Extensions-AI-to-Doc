@@ -6,9 +6,8 @@
 const suite1 = require('./test-md-converter');
 const suite2 = require('./test-code-gs');
 const suite3 = require('./test-security-and-rules');
-const suite4 = require('./test-gdocs-compiler');
 
-const suites = [suite1, suite2, suite3, suite4];
+const suites = [suite1, suite2, suite3];
 
 let totalTests = 0;
 let totalPassed = 0;
@@ -60,7 +59,5 @@ if (totalFailed > 0) {
   });
   process.exit(1);
 } else {
-  console.log('\n✓ TẤT CẢ CÁC BỘ KIỂM THỬ ĐÃ VƯỢT QUA XUẤT SẮC!');
-  process.exit(0);
+  console.log('\n✓ TẤT CẢ CÁC BỘ KIỂM THỬ ĐÃ VƯỢT QUA XUẤT SẮC!\n');
 }
-

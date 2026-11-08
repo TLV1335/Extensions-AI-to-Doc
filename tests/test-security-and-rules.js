@@ -17,29 +17,22 @@ function test(name, fn) {
 /* ==================== TEST CASES ==================== */
 
 // --- 1. Manifest V3 Permission Audit (Principle of Least Privilege) ---
-test('Manifest: Strictly limited permissions (storage, identity)', () => {
+test('Manifest: Strictly limited to storage permission', () => {
   const manifest = JSON.parse(fs.readFileSync('extension/manifest.json', 'utf8'));
   assert.strictEqual(manifest.manifest_version, 3);
-  
-  const allowedPermissions = ['storage', 'identity'];
-  for (const p of manifest.permissions) {
-    assert(allowedPermissions.includes(p), `Quyền không được phép trong manifest: ${p}`);
-  }
+  assert.deepStrictEqual(manifest.permissions, ['storage'], 'Không được thêm permission thừa vào manifest');
 
-  const forbiddenPermissions = ['tabs', 'activeTab', '<all_urls>', 'cookies', 'webRequest'];
+  const forbiddenPermissions = ['tabs', 'activeTab', '<all_urls>', 'identity', 'cookies', 'webRequest'];
   for (const p of forbiddenPermissions) {
     assert.strictEqual(manifest.permissions.includes(p), false, `Phát hiện quyền bị cấm: ${p}`);
   }
 });
 
-test('Manifest: Host permissions restricted strictly to Google domains', () => {
+test('Manifest: Host permissions restricted strictly to Google Script', () => {
   const manifest = JSON.parse(fs.readFileSync('extension/manifest.json', 'utf8'));
   const allowed = [
     'https://script.google.com/*',
-    'https://script.googleusercontent.com/*',
-    'https://docs.googleapis.com/*',
-    'https://www.googleapis.com/*',
-    'https://accounts.google.com/*'
+    'https://script.googleusercontent.com/*'
   ];
   assert.deepStrictEqual(manifest.host_permissions, allowed);
 });
@@ -52,9 +45,7 @@ test('Security Audit: No hardcoded deployment IDs or real token values', () => {
     'extension/background.js',
     'extension/content.js',
     'extension/options.js',
-    'extension/options.html',
-    'extension/gdocs-compiler.js',
-    'extension/gdocs-service.js'
+    'extension/options.html'
   ];
 
   const akfRegex = /AKfycb[a-zA-Z0-9_-]{20,}/g;
