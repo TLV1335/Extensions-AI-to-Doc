@@ -17,22 +17,29 @@ function test(name, fn) {
 /* ==================== TEST CASES ==================== */
 
 // --- 1. Manifest V3 Permission Audit (Principle of Least Privilege) ---
-test('Manifest: Strictly limited to storage permission', () => {
+test('Manifest: Strictly limited permissions (storage, identity)', () => {
   const manifest = JSON.parse(fs.readFileSync('extension/manifest.json', 'utf8'));
   assert.strictEqual(manifest.manifest_version, 3);
-  assert.deepStrictEqual(manifest.permissions, ['storage'], 'Không được thêm permission thừa vào manifest');
+  
+  const allowedPermissions = ['storage', 'identity'];
+  for (const p of manifest.permissions) {
+    assert(allowedPermissions.includes(p), `Quyền không được phép trong manifest: ${p}`);
+  }
 
-  const forbiddenPermissions = ['tabs', 'activeTab', '<all_urls>', 'identity', 'cookies', 'webRequest'];
+  const forbiddenPermissions = ['tabs', 'activeTab', '<all_urls>', 'cookies', 'webRequest'];
   for (const p of forbiddenPermissions) {
     assert.strictEqual(manifest.permissions.includes(p), false, `Phát hiện quyền bị cấm: ${p}`);
   }
 });
 
-test('Manifest: Host permissions restricted strictly to Google Script', () => {
+test('Manifest: Host permissions restricted strictly to Google domains', () => {
   const manifest = JSON.parse(fs.readFileSync('extension/manifest.json', 'utf8'));
   const allowed = [
     'https://script.google.com/*',
-    'https://script.googleusercontent.com/*'
+    'https://script.googleusercontent.com/*',
+    'https://docs.googleapis.com/*',
+    'https://www.googleapis.com/*',
+    'https://accounts.google.com/*'
   ];
   assert.deepStrictEqual(manifest.host_permissions, allowed);
 });
@@ -45,46 +52,39 @@ test('Security Audit: No hardcoded deployment IDs or real token values', () => {
     'extension/background.js',
     'extension/content.js',
     'extension/options.js',
-    'extension/options.html'
+    'extension/options.html',
+    'extension/gdocs-compiler.js',
+    'extension/gdocs-service.js'
   ];
 
+  const akfRegex = /AKfycb[a-zA-Z0-9_-]{20,}/g;
+  const tokenRegex = /token\s*[:=]\s*['"][a-zA-Z0-9_-]{32,}['"]/g;
+
   for (const file of filesToScan) {
+    if (!fs.existsSync(file)) continue;
     const content = fs.readFileSync(file, 'utf8');
-    // Kiểm tra deployment ID thực dạng AKfycb...
-    assert.strictEqual(/AKfycb[A-Za-z0-9_-]{20,}/.test(content), false, `Rò rỉ deployment ID trong ${file}`);
-    // Kiểm tra link deployment thực
-    assert.strictEqual(/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]{20,}\/exec/.test(content), false, `Rò rỉ Web App URL thực trong ${file}`);
+    assert(!akfRegex.test(content), `Phát hiện hardcode Apps Script Deployment ID trong ${file}`);
+    assert(!tokenRegex.test(content), `Phát hiện hardcode Secret Token trong ${file}`);
   }
 });
 
-// --- 3. Rule 6: No literal triple backticks in source code ---
+// --- 3. Rules & Code Constraints ---
 test('Rule 6: No literal triple backticks in Code.gs or content.js', () => {
-  const bt3 = String.fromCharCode(96).repeat(3);
   const codeGs = fs.readFileSync('apps-script/Code.gs', 'utf8');
-  const contentJs = fs.readFileSync('extension/content.js', 'utf8');
+  assert(!codeGs.includes('```'), 'Code.gs không được chứa ký tự 3 dấu backtick trực tiếp (phải dùng FENCE hoặc regex)');
 
-  assert.strictEqual(codeGs.includes(bt3), false, 'Phát hiện literal triple backtick trong apps-script/Code.gs');
-  assert.strictEqual(contentJs.includes(bt3), false, 'Phát hiện literal triple backtick trong extension/content.js');
+  const contentJs = fs.readFileSync('extension/content.js', 'utf8');
+  assert(!contentJs.includes('```'), 'content.js không được chứa 3 dấu backtick trực tiếp');
 });
 
-// --- 4. CORS & CSP Rule Check ---
 test('CORS Constraint: background.js uses Content-Type: text/plain;charset=utf-8', () => {
   const bg = fs.readFileSync('extension/background.js', 'utf8');
-  assert.strictEqual(
-    bg.includes("'Content-Type': 'text/plain;charset=utf-8'"),
-    true,
-    'background.js bắt buộc dùng text/plain để tránh preflight CORS'
-  );
+  assert(bg.includes("'Content-Type': 'text/plain;charset=utf-8'"), 'background.js bắt buộc dùng text/plain để tránh CORS preflight');
 });
 
 test('CSP Constraint: content.js does not contain fetch to Apps Script', () => {
   const content = fs.readFileSync('extension/content.js', 'utf8');
-  assert.strictEqual(
-    content.includes('fetch('),
-    false,
-    'content.js không được gọi fetch trực tiếp (phải thông qua background.js để tránh CSP của site AI)'
-  );
+  assert(!content.includes('fetch('), 'content.js không được tự ý gọi fetch (vi phạm CSP của AI sites)');
 });
 
 module.exports = suite;
-

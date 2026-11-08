@@ -1,12 +1,18 @@
 {
   "manifest_version": 3,
   "name": "AI to Google Docs",
-  "version": "1.0.0",
-  "description": "Gửi câu trả lời AI vào Google Docs bằng phím tắt.",
-  "permissions": ["storage"],
+  "version": "1.1.0",
+  "description": "Gửi câu trả lời AI vào Google Docs bằng phím tắt hoặc một cú click chuột.",
+  "permissions": [
+    "storage",
+    "identity"
+  ],
   "host_permissions": [
     "https://script.google.com/*",
-    "https://script.googleusercontent.com/*"
+    "https://script.googleusercontent.com/*",
+    "https://docs.googleapis.com/*",
+    "https://www.googleapis.com/*",
+    "https://accounts.google.com/*"
   ],
   "action": {
     "default_popup": "popup.html",
@@ -40,4 +46,3 @@
   },
   "options_page": "options.html"
 }
-

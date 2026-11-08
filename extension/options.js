@@ -9,6 +9,7 @@ const SITES = [
 ];
 
 let savedDocsList = [];
+let currentAuthMode = 'google';
 
 function extractDocId(str) {
   if (!str) return '';
@@ -16,27 +17,110 @@ function extractDocId(str) {
   return m ? m[1] : String(str).trim();
 }
 
+// Khởi tạo hiển thị Redirect URI của Extension
+if (typeof chrome !== 'undefined' && chrome.identity && chrome.identity.getRedirectURL) {
+  try {
+    const redirectEl = $('extension-redirect-uri');
+    if (redirectEl) {
+      redirectEl.textContent = chrome.identity.getRedirectURL();
+    }
+  } catch (_) {}
+}
+
 // Nạp cài đặt khi mở trang
 chrome.storage.local.get({
+  authMode: 'google',
+  userEmail: '',
+  oauthToken: '',
+  googleClientId: '',
   url: '',
   token: '',
   defaultDoc: '',
   siteDocs: {},
   savedDocs: []
-}).then(({ url, token, defaultDoc, siteDocs, savedDocs }) => {
-  $('url').value = url || '';
-  $('token').value = token || '';
+}).then((store) => {
+  currentAuthMode = store.authMode || 'google';
+  setAuthTab(currentAuthMode);
 
-  savedDocsList = savedDocs || [];
-  if (defaultDoc && !savedDocsList.some(d => d.id === extractDocId(defaultDoc))) {
+  if ($('url')) $('url').value = store.url || '';
+  if ($('token')) $('token').value = store.token || '';
+  if ($('google-client-id')) $('google-client-id').value = store.googleClientId || '';
+
+  updateGoogleAuthUI(store.userEmail, Boolean(store.oauthToken));
+
+  savedDocsList = store.savedDocs || [];
+  if (store.defaultDoc && !savedDocsList.some(d => d.id === extractDocId(store.defaultDoc))) {
     savedDocsList.unshift({
-      id: extractDocId(defaultDoc),
+      id: extractDocId(store.defaultDoc),
       name: 'Google Doc chính',
-      url: defaultDoc
+      url: store.defaultDoc
     });
   }
 
-  renderUI(defaultDoc, siteDocs);
+  renderUI(store.defaultDoc, store.siteDocs);
+});
+
+function setAuthTab(mode) {
+  currentAuthMode = mode;
+  if (mode === 'google') {
+    $('tab-google').classList.add('active');
+    $('tab-appsscript').classList.remove('active');
+    $('section-google-auth').style.display = 'block';
+    $('section-appsscript').style.display = 'none';
+  } else {
+    $('tab-appsscript').classList.add('active');
+    $('tab-google').classList.remove('active');
+    $('section-appsscript').style.display = 'block';
+    $('section-google-auth').style.display = 'none';
+  }
+  chrome.storage.local.set({ authMode: mode });
+}
+
+$('tab-google').addEventListener('click', () => setAuthTab('google'));
+$('tab-appsscript').addEventListener('click', () => setAuthTab('appsscript'));
+
+function updateGoogleAuthUI(email, isConnected) {
+  const disView = $('google-disconnected-view');
+  const connView = $('google-connected-view');
+  const emailDisplay = $('user-email-display');
+
+  if (isConnected && email) {
+    disView.style.display = 'none';
+    connView.style.display = 'block';
+    emailDisplay.textContent = email;
+  } else {
+    disView.style.display = 'block';
+    connView.style.display = 'none';
+  }
+}
+
+// Xử lý nút Đăng nhập Google
+$('btn-login-google').addEventListener('click', () => {
+  const statusEl = $('google-login-status');
+  statusEl.textContent = 'Đang mở cửa sổ đăng nhập Google...';
+  statusEl.style.color = '#1a73e8';
+
+  const customClientId = ($('google-client-id') && $('google-client-id').value.trim()) || '';
+  chrome.storage.local.set({ googleClientId: customClientId }).then(() => {
+    chrome.runtime.sendMessage({ type: 'loginGoogle' }, (res) => {
+      if (res && res.ok) {
+        statusEl.textContent = '';
+        updateGoogleAuthUI(res.email, true);
+        showStatus('Đăng nhập tài khoản Google thành công!');
+      } else {
+        statusEl.textContent = `Lỗi đăng nhập: ${res?.error || 'Không thành công'}`;
+        statusEl.style.color = '#c5221f';
+      }
+    });
+  });
+});
+
+// Xử lý nút Đăng xuất Google
+$('btn-logout-google').addEventListener('click', () => {
+  chrome.runtime.sendMessage({ type: 'logoutGoogle' }, () => {
+    updateGoogleAuthUI('', false);
+    showStatus('Đã đăng xuất tài khoản Google.');
+  });
 });
 
 function renderUI(defaultDoc, siteDocs) {
@@ -83,7 +167,7 @@ function renderUI(defaultDoc, siteDocs) {
     });
   });
 
-  // 3. Render danh sách tài liệu đã lưu (quản lý / xóa)
+  // 3. Render danh sách tài liệu đã lưu
   const listContainer = $('doc-list-container');
   const itemsContainer = $('doc-list-items');
   itemsContainer.innerHTML = '';
@@ -95,10 +179,10 @@ function renderUI(defaultDoc, siteDocs) {
       row.className = 'doc-item';
       row.innerHTML = `
         <div>
-          <div class="doc-name">${d.name}</div>
-          <div class="doc-id">ID: ${d.id}</div>
+          <div class="doc-name">${escapeHtml(d.name)}</div>
+          <div class="doc-id">ID: ${escapeHtml(d.id)}</div>
         </div>
-        <button class="btn-del" data-idx="${idx}">Xóa</button>
+        <button class="btn-del" data-idx="${idx}" type="button">Xóa</button>
       `;
       itemsContainer.appendChild(row);
     });
@@ -117,6 +201,12 @@ function renderUI(defaultDoc, siteDocs) {
   }
 }
 
+function escapeHtml(str) {
+  return String(str || '').replace(/[&<>"']/g, (m) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[m]));
+}
+
 // Nút Thêm Doc & Tự động lấy tên
 $('btn-fetch-add').addEventListener('click', async () => {
   const inputVal = $('new-doc-input').value.trim();
@@ -132,15 +222,33 @@ $('btn-fetch-add').addEventListener('click', async () => {
   feedback.textContent = 'Đang tự động lấy tên Google Doc...';
   feedback.style.color = '#1a73e8';
 
-  chrome.runtime.sendMessage({ type: 'getDocName', docId }, async (res) => {
+  // Lấy dữ liệu input hiện tại để gửi kèm
+  const currentUrl = $('url') ? $('url').value.trim() : '';
+  const currentToken = $('token') ? $('token').value.trim() : '';
+
+  // Tự động lưu ngầm URL và Token
+  await chrome.storage.local.set({
+    url: currentUrl,
+    token: currentToken,
+    authMode: currentAuthMode
+  });
+
+  chrome.runtime.sendMessage({
+    type: 'getDocName',
+    docId,
+    mode: currentAuthMode,
+    url: currentUrl,
+    token: currentToken
+  }, async (res) => {
     let docName = '';
     if (res && res.ok && res.name) {
       docName = res.name;
-      feedback.textContent = `Đã tìm thấy: "${docName}"`;
+      feedback.textContent = `✓ Đã tìm thấy: "${docName}"`;
       feedback.style.color = '#137333';
     } else {
       docName = 'Google Doc (' + docId.slice(0, 8) + '...)';
-      feedback.textContent = `Đã thêm (Không lấy được tên tự động: ${((res && res.error) || 'lỗi kết nối')})`;
+      const errMsg = (res && res.error) || 'Không thể kết nối đến tài liệu';
+      feedback.textContent = `Đã thêm ID (Chưa lấy được tên tự động: ${errMsg})`;
       feedback.style.color = '#e37400';
     }
 
@@ -165,10 +273,17 @@ $('btn-fetch-add').addEventListener('click', async () => {
   });
 });
 
+// Tự động lưu khi thay đổi chọn lựa
+$('default-doc-select').addEventListener('change', async (e) => {
+  await chrome.storage.local.set({ defaultDoc: e.target.value });
+  showStatus('Đã cập nhật Google Doc mặc định.');
+});
+
 // Nút Lưu toàn bộ cài đặt
 $('save').addEventListener('click', async () => {
-  const url = $('url').value.trim();
-  const token = $('token').value.trim();
+  const url = $('url') ? $('url').value.trim() : '';
+  const token = $('token') ? $('token').value.trim() : '';
+  const googleClientId = $('google-client-id') ? $('google-client-id').value.trim() : '';
   const defaultDoc = $('default-doc-select').value;
 
   const siteDocs = {};
@@ -182,6 +297,8 @@ $('save').addEventListener('click', async () => {
   });
 
   await chrome.storage.local.set({
+    authMode: currentAuthMode,
+    googleClientId,
     url,
     token,
     defaultDoc,
@@ -189,8 +306,14 @@ $('save').addEventListener('click', async () => {
     savedDocs: savedDocsList
   });
 
-  $('status').textContent = 'Đã lưu toàn bộ cài đặt thành công.';
-  setTimeout(() => {
-    $('status').textContent = '';
-  }, 2500);
+  showStatus('Đã lưu toàn bộ cài đặt thành công.');
 });
+
+function showStatus(text) {
+  const el = $('status');
+  if (!el) return;
+  el.textContent = text;
+  setTimeout(() => {
+    el.textContent = '';
+  }, 2500);
+}

@@ -8,28 +8,42 @@
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       font-size: 14px;
       line-height: 1.5;
-      max-width: 620px;
-      margin: 32px auto;
+      max-width: 650px;
+      margin: 28px auto;
       padding: 0 16px;
       color: #202124;
+      background: #fafafa;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #dadce0;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(60,64,67,0.08);
     }
     h1 {
       font-size: 22px;
-      margin-bottom: 20px;
+      margin: 0 0 16px;
       color: #1a73e8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
     .section-title {
       font-size: 16px;
       font-weight: 600;
-      margin-top: 24px;
-      margin-bottom: 8px;
-      border-bottom: 1px solid #dadce0;
-      padding-bottom: 6px;
+      margin-bottom: 12px;
+      color: #202124;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
     label {
       display: block;
-      margin-top: 14px;
+      margin-top: 12px;
       font-weight: 600;
+      font-size: 13px;
     }
     .hint {
       font-weight: normal;
@@ -40,16 +54,17 @@
     }
     input, select {
       width: 100%;
-      padding: 8px 10px;
+      padding: 9px 12px;
       box-sizing: border-box;
       border: 1px solid #dadce0;
-      border-radius: 4px;
+      border-radius: 6px;
       font-size: 14px;
       background: #fff;
     }
     input:focus, select:focus {
       outline: none;
       border-color: #1a73e8;
+      box-shadow: 0 0 0 2px rgba(26,115,232,0.2);
     }
     .add-row {
       display: flex;
@@ -58,17 +73,81 @@
     }
     .btn-add {
       white-space: nowrap;
-      padding: 8px 16px;
+      padding: 9px 18px;
       background: #1a73e8;
       color: #fff;
       border: none;
-      border-radius: 4px;
+      border-radius: 6px;
       font-weight: 600;
       cursor: pointer;
+      transition: background 0.15s ease;
     }
     .btn-add:hover { background: #1557b0; }
+    .btn-google {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      background: #fff;
+      color: #3c4043;
+      border: 1px solid #dadce0;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-google:hover {
+      background: #f8f9fa;
+      border-color: #c1c3c7;
+      box-shadow: 0 1px 2px rgba(60,64,67,0.15);
+    }
+    .btn-google svg { width: 18px; height: 18px; }
+    .auth-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: #e6f4ea;
+      color: #137333;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .btn-text-danger {
+      background: none;
+      border: none;
+      color: #d93025;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 0;
+      margin-left: 8px;
+    }
+    .mode-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #dadce0;
+      padding-bottom: 8px;
+    }
+    .mode-tab {
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: #5f6368;
+      background: transparent;
+      border: none;
+    }
+    .mode-tab.active {
+      color: #1a73e8;
+      background: #e8f0fe;
+    }
     .doc-list {
-      margin-top: 10px;
+      margin-top: 12px;
       border: 1px solid #e8eaed;
       border-radius: 6px;
       background: #f8f9fa;
@@ -78,7 +157,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 6px 0;
+      padding: 8px 0;
       border-bottom: 1px solid #f1f3f4;
     }
     .doc-item:last-child { border-bottom: none; }
@@ -93,7 +172,7 @@
       font-weight: 600;
     }
     details {
-      margin-top: 16px;
+      margin-top: 14px;
       background: #f8f9fa;
       padding: 12px 14px;
       border-radius: 6px;
@@ -105,33 +184,25 @@
       color: #1a73e8;
       user-select: none;
     }
-    .site-group {
-      margin-top: 12px;
-    }
-    .site-label {
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
+    .site-group { margin-top: 12px; }
+    .site-label { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
     .actions {
-      margin-top: 28px;
+      margin-top: 24px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: space-between;
     }
     button.btn-primary {
       padding: 10px 24px;
       background: #1a73e8;
       color: #fff;
       border: none;
-      border-radius: 4px;
-      font-weight: 500;
+      border-radius: 6px;
+      font-weight: 600;
       font-size: 14px;
       cursor: pointer;
     }
-    button.btn-primary:hover {
-      background: #1557b0;
-    }
+    button.btn-primary:hover { background: #1557b0; }
     #status {
       font-size: 13px;
       color: #188038;
@@ -140,69 +211,128 @@
   </style>
 </head>
 <body>
-  <h1>Cấu hình AI to Google Docs</h1>
-  
-  <div class="section-title">1. Kết nối Google Apps Script</div>
+  <h1>
+    <span>🚀</span> Cài đặt AI to Google Docs
+  </h1>
 
-  <label for="url">Web App URL</label>
-  <div class="hint">Đường dẫn Web App kết thúc bằng /exec (ví dụ: https://script.google.com/macros/s/.../exec)</div>
-  <input id="url" type="url" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" spellcheck="false">
+  <!-- Phần 1: Phương thức kết nối -->
+  <div class="card">
+    <div class="section-title">
+      <span>1. Phương thức kết nối</span>
+    </div>
 
-  <label for="token">Mã Token bí mật</label>
-  <div class="hint">Mã token bí mật trùng khớp với Script Property TOKEN trong Apps Script</div>
-  <input id="token" type="password" placeholder="Chuỗi token bí mật bạn đã đặt" autocomplete="off">
+    <div class="mode-tabs">
+      <button id="tab-google" class="mode-tab active" type="button">✨ Đăng nhập Google (Tự động 100%)</button>
+      <button id="tab-appsscript" class="mode-tab" type="button">⚙️ Google Apps Script (Thủ công)</button>
+    </div>
 
-  <div class="section-title">2. Danh sách Google Docs & Doc Mặc định</div>
+    <!-- Khối Google OAuth2 -->
+    <div id="section-google-auth">
+      <div id="google-disconnected-view">
+        <p class="hint" style="font-size: 13px; margin-bottom: 14px;">
+          Tự động kết nối trực tiếp với Google Docs qua tài khoản của bạn. Không cần tạo Apps Script hay cấu hình mã nguồn phức tạp.
+        </p>
+        <button id="btn-login-google" class="btn-google" type="button">
+          <svg viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          Đăng nhập với Google
+        </button>
+        <div id="google-login-status" class="hint" style="margin-top: 8px;"></div>
 
-  <label for="default-doc-select">Google Doc Mặc định (Áp dụng hàng loạt):</label>
-  <div class="hint">Chọn từ menu sổ xuống. Tất cả các trang AI sẽ tự động lưu vào Doc này (trừ khi trang đó được gán Doc riêng).</div>
-  <select id="default-doc-select"></select>
+        <details style="margin-top: 14px;">
+          <summary style="font-size: 12px;">Cấu hình OAuth Client ID riêng (Dành cho Developer)</summary>
+          <div class="hint" style="margin-top: 6px;">
+            Nếu bạn tự tạo OAuth Client ID trên Google Cloud Console, hãy dán Client ID vào đây:
+          </div>
+          <input id="google-client-id" type="text" placeholder="xxxx.apps.googleusercontent.com" autocomplete="off" spellcheck="false">
+          <div class="hint" style="margin-top: 4px;">
+            Đường dẫn Redirect URI của extension này: <code id="extension-redirect-uri" style="background:#f1f3f4; padding:2px 4px; border-radius:3px;"></code>
+          </div>
+        </details>
+      </div>
 
-  <label style="margin-top: 16px;">Thêm Google Doc mới vào danh sách (Tự động lấy tên):</label>
-  <div class="hint">Dán link Google Doc (hoặc ID) rồi bấm nút để hệ thống tự động tìm và lấy tên tài liệu:</div>
-  <div class="add-row">
-    <input id="new-doc-input" type="text" placeholder="https://docs.google.com/document/d/.../edit">
-    <button id="btn-fetch-add" class="btn-add">Lấy tên & Thêm</button>
+      <div id="google-connected-view" style="display: none;">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: #f8f9fa; border-radius: 6px; border: 1px solid #e8eaed;">
+          <div class="auth-badge">
+            <span>✓</span> Đã kết nối: <span id="user-email-display">email@example.com</span>
+          </div>
+          <button id="btn-logout-google" class="btn-text-danger" type="button">Đăng xuất</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Khối Apps Script Web App -->
+    <div id="section-appsscript" style="display: none;">
+      <label for="url">Web App URL</label>
+      <div class="hint">Đường dẫn Web App kết thúc bằng /exec (ví dụ: https://script.google.com/macros/s/.../exec)</div>
+      <input id="url" type="url" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" spellcheck="false">
+
+      <label for="token">Mã Token bí mật</label>
+      <div class="hint">Mã token bí mật trùng khớp với Script Property TOKEN trong Apps Script</div>
+      <input id="token" type="password" placeholder="Chuỗi token bí mật bạn đã đặt" autocomplete="off">
+    </div>
   </div>
-  <div id="add-feedback" class="hint" style="margin-top: 4px;"></div>
 
-  <div class="doc-list" id="doc-list-container" style="display: none; margin-top: 12px;">
-    <div style="font-weight: 600; font-size: 12px; margin-bottom: 6px; color: #3c4043;">Tài liệu đã lưu:</div>
-    <div id="doc-list-items"></div>
+  <!-- Phần 2: Quản lý Google Docs -->
+  <div class="card">
+    <div class="section-title">
+      <span>2. Danh sách Google Docs & Doc Mặc định</span>
+    </div>
+
+    <label for="default-doc-select">Google Doc Mặc định (Áp dụng hàng loạt):</label>
+    <div class="hint">Tất cả các trang AI sẽ tự động lưu vào Doc này (trừ khi trang đó được gán Doc riêng).</div>
+    <select id="default-doc-select"></select>
+
+    <label style="margin-top: 16px;">Thêm Google Doc mới vào danh sách (Tự động lấy tên):</label>
+    <div class="hint">Dán link Google Doc (hoặc ID) rồi bấm nút để hệ thống tự động tìm và lấy tên tài liệu:</div>
+    <div class="add-row">
+      <input id="new-doc-input" type="text" placeholder="https://docs.google.com/document/d/.../edit">
+      <button id="btn-fetch-add" class="btn-add" type="button">Lấy tên & Thêm</button>
+    </div>
+    <div id="add-feedback" class="hint" style="margin-top: 6px; font-weight: 500;"></div>
+
+    <div class="doc-list" id="doc-list-container" style="display: none; margin-top: 14px;">
+      <div style="font-weight: 600; font-size: 12px; margin-bottom: 6px; color: #3c4043;">Tài liệu đã lưu:</div>
+      <div id="doc-list-items"></div>
+    </div>
+
+    <details style="margin-top: 16px;">
+      <summary>3. Tùy chọn nâng cao: Chỉ định Doc riêng theo từng trang</summary>
+      <div class="hint" style="margin-top: 8px;">Nếu chọn "(Dùng Google Doc mặc định chung)", trang đó sẽ tự động lưu theo menu số 2 ở trên.</div>
+
+      <div class="site-group">
+        <div class="site-label">NotebookLM (notebooklm.google.com)</div>
+        <select id="site_notebooklm"></select>
+      </div>
+
+      <div class="site-group">
+        <div class="site-label">ChatGPT (chatgpt.com)</div>
+        <select id="site_chatgpt"></select>
+      </div>
+
+      <div class="site-group">
+        <div class="site-label">DeepSeek (chat.deepseek.com)</div>
+        <select id="site_deepseek"></select>
+      </div>
+
+      <div class="site-group">
+        <div class="site-label">Gemini (gemini.google.com)</div>
+        <select id="site_gemini"></select>
+      </div>
+
+      <div class="site-group">
+        <div class="site-label">Claude (claude.ai)</div>
+        <select id="site_claude"></select>
+      </div>
+    </details>
   </div>
-
-  <details>
-    <summary>3. Tùy chọn nâng cao: Chỉ định Doc riêng theo từng trang</summary>
-    <div class="hint" style="margin-top: 8px;">Nếu chọn "(Dùng Google Doc mặc định chung)", trang đó sẽ tự động lưu theo menu số 2 ở trên.</div>
-
-    <div class="site-group">
-      <div class="site-label">NotebookLM (notebooklm.google.com)</div>
-      <select id="site_notebooklm"></select>
-    </div>
-
-    <div class="site-group">
-      <div class="site-label">ChatGPT (chatgpt.com)</div>
-      <select id="site_chatgpt"></select>
-    </div>
-
-    <div class="site-group">
-      <div class="site-label">DeepSeek (chat.deepseek.com)</div>
-      <select id="site_deepseek"></select>
-    </div>
-
-    <div class="site-group">
-      <div class="site-label">Gemini (gemini.google.com)</div>
-      <select id="site_gemini"></select>
-    </div>
-
-    <div class="site-group">
-      <div class="site-label">Claude (claude.ai)</div>
-      <select id="site_claude"></select>
-    </div>
-  </details>
 
   <div class="actions">
-    <button id="save" class="btn-primary">Lưu toàn bộ cài đặt</button>
+    <button id="save" class="btn-primary" type="button">Lưu cài đặt</button>
     <span id="status"></span>
   </div>
 
